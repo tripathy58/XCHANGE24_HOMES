@@ -1267,4 +1267,4 @@ def employee_add_location():
     return render_template('employee_product_.html')
 
 
-app.run(debug=True, port=5088)
+app.run(debug=False, host='0.0.0.0')
