@@ -1,0 +1,12 @@
+from getpass import getuser
+import pymysql
+from flask import Flask, render_template, session, redirect, request, flash, json, url_for, jsonify,abort
+import re
+from flaskext.mysql import MySQL
+from werkzeug.utils import secure_filename
+import os
+from flask_mail import *
+from random import *
+from werkzeug.exceptions import HTTPException
+
+3.10

@@ -1,0 +1,41 @@
+<button id="openModal">Open Modal</button>
+
+<div id="modal" style="display:none;">
+  <form id="modalForm">
+    <input type="text" name="name" placeholder="Name">
+    <input type="email" name="email" placeholder="Email">
+    <button type="submit">Submit</button>
+  </form>
+</div>
+
+<div id="successModal" style="display:none;">
+  <p>Form submitted successfully!</p>
+  <button id="closeSuccessModal">Close</button>
+</div>
+
+<script>
+    $(document).ready(function() {
+  $("#openModal").click(function() {
+    $("#modal").show();
+  });
+
+  $("#modalForm").submit(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+      type: "POST",
+      url: "submit.php",
+      data: $("#modalForm").serialize(),
+      success: function(response) {
+        $("#modal").hide();
+        $("#successModal").show();
+      }
+    });
+  });
+
+  $("#closeSuccessModal").click(function() {
+    $("#successModal").hide();
+  });
+});
+
+</script>
