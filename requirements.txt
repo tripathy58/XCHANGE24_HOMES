@@ -10,6 +10,6 @@ Jinja2==2.11.3
 MarkupSafe==1.1.1
 mysql-connector==2.2.9
 pycodestyle==2.8.0
-PyMySQL==1.0.2
+PyMySQL==1.0.0
 tomli==2.0.1
 Werkzeug==2.2.2
