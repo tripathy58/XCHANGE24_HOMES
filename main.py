@@ -11,7 +11,7 @@ from flask_mail import *
 from random import *
 from werkzeug.exceptions import HTTPException
 import io
-io.open('requirments.txt', encoding='utf-16')
+
 
 app = Flask(__name__)
 
