@@ -1,54 +1,11 @@
--- phpMyAdmin SQL Dump
--- version 5.2.0
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Generation Time: Feb 06, 2023 at 02:22 PM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 8.1.12
+
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
 
---
--- Database: `xchange24`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `admin_chat`
---
-
-CREATE TABLE `admin_chat` (
-  `id` int(11) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `name` text NOT NULL,
-  `message` varchar(10000) NOT NULL,
-  `admin_email` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `admin_chat`
---
-
-INSERT INTO `admin_chat` (`id`, `email`, `name`, `message`, `admin_email`) VALUES
-(1, 'sudeptalenka94@gmail.com', '', 'yes available', 'tripathysonu59@gmail.com'),
-(2, 'sudeptalenka94@gmail.com', '', 'want it', 'tripathysonu59@gmail.com'),
-(3, 'sudeptalenka94@gmail.com', '', 'do u want it', 'tripathysonu59@gmail.com'),
-(4, 'sudeptalenka94@gmail.com', '', 'do u want it', 'tripathysonu59@gmail.com'),
-(5, 'sudeptalenka94@gmail.com', '', 'do u want it', 'tripathysonu59@gmail.com'),
-(6, 'sudeptalenka94@gmail.com', '', 'do u want it', 'tripathysonu59@gmail.com'),
-(7, 'sudeptalenka94@gmail.com', '', 'hii', 'tripathysonu59@gmail.com');
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `admin_login`

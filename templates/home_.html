@@ -3,7 +3,7 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="utf-8">
+  
   <meta name="keywords" content="">
   <meta name="description" content="">
   <!-- <img src="/static/images/logo.png" alt=""> -->
@@ -1066,11 +1066,11 @@ c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,24
                     </div>
                     <div>
                       <label style="font-weight: 100 !important;"><input style="width: auto !important;" type="checkbox"
-                          value="AG Colony" id="AG_Colony" /> AG Colony </label><br>
+                          value="AG Colony" id="AG Colony" /> AG Colony </label><br>
                       <label style="font-weight: 100 !important;"><input style="width: auto !important;" type="checkbox"
                           value="Patia" id="Patia" /> Patia </label><br>
                       <label style="font-weight: 100 !important;"><input style="width: auto !important;" type="checkbox"
-                          value="SIshu Vihar" id="SIshu_Vihar" /> SIshu Vihar </label><br>
+                          value="SIshu Vihar" id="Sishu_Vihar" /> SIshu Vihar </label><br>
                       <label style="font-weight: 100 !important;"><input style="width: auto !important;" type="checkbox"
                           value="Damana" id="Damana" /> Damana </label>
 
@@ -1278,7 +1278,7 @@ c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,24
         <div class="u-repeater u-repeater-1 animals" id="myItems">
           {% for row in ads %}
           <div data-href="/product_details_/{{row.id}}"
-            data-category="{{row.city}} {{row.bhk_type}} {{row.house_type}} {{row.furnishing}} {{row.tenant}} {{row.pg}} "
+            data-category="{{row.city}} {{row.bhk_type}} {{row.house_type}} {{row.furnishing}} {{row.tenant}} {{row.pg}} {{row.locality}} "
             class="animal list-item u-border-1 u-border-palette-5-dark-1 u-container-style u-hover-feature u-list-item u-radius-5 u-repeater-item u-shape-round u-list-item-1">
             <div class="u-container-layout u-similar-container u-container-layout-2">
               <!-- <span
