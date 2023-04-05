@@ -52,10 +52,10 @@
   <meta property="og:type" content="website">
 </head>
 
+{% if session['loggedin'] %}
 <div id="zsiqchat">
-
 </div>
-
+{% endif %}
 <body class="u-body u-xl-mode" data-lang="en">
   <header class="top-navabr u-box-shadow u-clearfix u-header u-palette-5-light-3 u-sticky u-sticky-1ed6 u-header"
     id="sec-567a">
@@ -126,8 +126,14 @@
         <input class="u-search-input" type="text" id="value" placeholder="Search">
       </div>
       {% if session['loggedin'] %}
-      <a href="#" data-bs-toggle="modal" data-bs-target="#staticBackdropsetlocation"
-        class="u-active-white u-border-1 u-border-grey-75 u-btn u-btn-round u-button-style u-hidden-md u-hidden-sm u-hidden-xs u-hover-white u-radius-3 u-text-black u-text-hover-black u-white u-btn-1">{{user['location']}}&nbsp;<span
+      <a href="#" data-bs-toggle="modal" data-bs-target="#staticBackdropsetlocation" style=""
+        class="u-active-white u-border-1 u-border-grey-75 u-btn u-btn-round u-button-style u-hidden-md u-hidden-sm u-hidden-xs u-hover-white u-radius-3 u-text-black u-text-hover-black u-white u-btn-1">
+        {% if user['location'] %}
+        {{user['location']}}&nbsp;
+        {% else %}
+        Location &nbsp;
+        {% endif %}
+        <span
           class="u-icon u-text-black u-icon-1"><svg class="u-svg-content" viewBox="0 0 490.677 490.677" x="0px" y="0px"
             style="width: 1em; height: 1em;">
             <path
@@ -1303,7 +1309,7 @@ c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,24
               <h6 class="u-text u-text-default u-text-3"><span class="u-file-icon u-icon"><img
                     src="/static/images/7204809.png" alt=""></span>{{row.rent}}
               </h6>
-              <p class="u-small-text u-text u-text-default u-text-variant u-text-4">{{row.locality}}, Bhubaneswar</p>
+              <p class="u-small-text u-text u-text-default u-text-variant u-text-4" style="font-size: 10px;">{{row.locality}}, Bhubaneswar</p>
             </div>
           </div>
           {% endfor %}
@@ -1347,7 +1353,9 @@ c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,24
           </span>
         </a>
       </div>
-
+      {% for row in loc %}
+      {row.locality}
+      {% endfor %}
       <div
         class="u-border-3 u-border-custom-color-3 u-border-no-bottom u-border-no-right u-border-no-top u-container-style u-expanded-width u-group u-palette-5-light-2 u-shape-rectangle u-group-2">
         <div class="u-container-layout u-valign-middle u-container-layout-6">
@@ -1358,7 +1366,7 @@ c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,24
         <div class="u-repeater u-repeater-2 animals recruiter" id="">
           {% if session['loggedin'] %}
           {% if user['location'] %}
-          {% for row in location %}
+          {% for row in loc %}
           <style>
             .content {
               display: none;
@@ -1391,7 +1399,7 @@ c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,24
                     src="/static/images/7204809.png" alt=""></span>{{row.rent}}
               </h6>
               <center>
-                <p class="u-small-text u-text u-text-default u-text-variant u-text-17" style="font-size: 8px;">
+                <p class="u-small-text u-text u-text-default u-text-variant u-text-17" style="font-size: 10px;">
                   {{row.locality}},Bhubaneswar
                 </p>
               </center>

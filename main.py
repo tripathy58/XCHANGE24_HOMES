@@ -1,8 +1,6 @@
-
-
 from getpass import getuser
 import pymysql
-from flask import Flask, render_template, session, redirect, request, flash, json, url_for, jsonify,abort
+from flask import Flask, render_template, session, redirect, request, flash, json, url_for, jsonify, abort
 import re
 from flaskext.mysql import MySQL
 from werkzeug.utils import secure_filename
@@ -10,7 +8,6 @@ import os
 from flask_mail import *
 from random import *
 from werkzeug.exceptions import HTTPException
-import io
 
 
 app = Flask(__name__)
@@ -30,8 +27,8 @@ with open('config.json', 'r') as c:
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'ashishtripathy58@gmail.com'
-app.config['MAIL_PASSWORD'] = 'mtodxrbxrfmpbiaa'
+app.config['MAIL_USERNAME'] = 'xchange24homes@gmail.com'
+app.config['MAIL_PASSWORD'] = 'nqgpknlcnmqkwwhl'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['SECRET_KEY'] = 'ashish'
@@ -56,13 +53,12 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-  
 # # app name
 # @app.errorhandler(404)
-  
+
 # # inbuilt function which takes error as parameter
 # def not_found(e):
-  
+
 # # defining function
 #   return render_template("404.html")
 
@@ -78,10 +74,12 @@ def page_not_found(e):
         # otherwise we return our generic site-wide 404 page
         return render_template("404.html"), 404
 
+
 @app.errorhandler(500)
 def internal_server_error(e):
     # note that we set the 500 status explicitly
     return render_template('500.html'), 500
+
 
 @app.errorhandler(405)
 def method_not_allowed(e):
@@ -98,27 +96,33 @@ def method_not_allowed(e):
 def home():
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM user_login WHERE email = "' +
-                   session['email']+'" ')
+                       session['email']+'" ')
         user = cursor.fetchone()
         cursor.execute('''SELECT *,image2,substring_index(substring_index(image2, ',', -1), ',', 1) photo 
-FROM ads WHERE status = "Enable" 
+                            FROM ads WHERE status = "Enable" 
                      ''')
         location = cursor.fetchall()
-    # cursor.execute('SELECT * FROM ads WHERE status = "Enable" ')
         cursor.execute('''SELECT *,image2,
-        substring_index(substring_index(image2, ',', -1), ',', 1) photo 
-        FROM ads WHERE status = "Enable" ''')
+                            substring_index(substring_index(image2, ',', -1), ',', 1) photo 
+                            FROM ads WHERE status = "Enable" ''')
         ads = cursor.fetchall()
 
         if request.method == 'POST':
             location = request.form['location']
+            locality = request.form['location']
             cursor.execute("UPDATE user_login SET location=%s WHERE email = '" +
-                    session['email']+"' ",(location))
+                           session['email']+"' ", (location))
             
+            cursor.execute('''
+            SELECT *,image2,substring_index(substring_index(image2, ',', -1), ',', 1) photo
+              FROM ads WHERE locality = %s ''', (locality))
+            # cursor.execute('''
+            # SELECT *,image2,substring_index(substring_index(image2, ',', -1), ',', 1) photo
+            #   FROM ads WHERE locality = (SELECT location FROM user_login WHERE location = %s) ''',(location))
+            loc = cursor.fetchall()
             conn.commit()
-            flash('Location Set Successfully','success')
-            return redirect('/')
-        
+            flash('Location Set Successfully', 'success')
+            return redirect(url_for("home", loc=loc))
 
         if request.method == 'POST':
             password = request.form['password']
@@ -128,17 +132,17 @@ FROM ads WHERE status = "Enable"
                 return render_template("home_.html")
             else:
                 cursor.execute('UPDATE user_login SET password = %s WHERE email = "' +
-                            session['email'] + '" ', (password))
+                               session['email'] + '" ', (password))
                 conn.commit()
                 flash('Password Changed Successfully')
                 return redirect('/user_profile')
-        return render_template('home_.html', ads=ads,user=user, location=location)
+        return render_template('home_.html', ads=ads, user=user, location=location)
     else:
         cursor.execute('''SELECT *,image2,
         substring_index(substring_index(image2, ',', -1), ',', 1) photo 
         FROM ads WHERE status = "Enable" ''')
         ads = cursor.fetchall()
-        
+
         return render_template('home_.html', ads=ads)
 
 
@@ -146,7 +150,7 @@ FROM ads WHERE status = "Enable"
 def product_details(id):
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM user_login WHERE email = "' +
-                   session['email']+'" ')
+                       session['email']+'" ')
         user = cursor.fetchone()
         cursor.execute("""SELECT *, image2,
     substring_index(substring_index(image2, ',', -1), ',', 1) photo,
@@ -159,7 +163,8 @@ def product_details(id):
     FROM ads WHERE id = %s """, (id))
         pds = cursor.fetchall()
         cursor.execute(
-            'SELECT * FROM ads WHERE city = (SELECT city FROM ads WHERE id=%s) ', (id))
+            '''SELECT *,image2,
+    substring_index(substring_index(image2, ',', -1), ',', 1) photo FROM ads WHERE city = (SELECT city FROM ads WHERE id=%s) ''', (id))
         img = cursor.fetchall()
         return render_template('product_details_.html', pds=pds, img=img, user=user)
     else:
@@ -178,17 +183,18 @@ def product_details(id):
         img = cursor.fetchall()
         return render_template('product_details_.html', pds=pds, img=img)
 
+
 @app.route('/status_', methods=['GET', 'POST'])
 def status():
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM user_login WHERE email = "' +
-                   session['email']+'" ')
+                       session['email']+'" ')
         user = cursor.fetchone()
         cursor.execute(
             'SELECT * FROM status WHERE date BETWEEN CURDATE() - INTERVAL 1 DAY AND CURRENT_DATE ORDER BY id DESC ')
         status = cursor.fetchall()
 
-        return render_template('status_.html', status=status,user=user)
+        return render_template('status_.html', status=status, user=user)
     else:
         cursor.execute(
             'SELECT * FROM status WHERE date BETWEEN CURDATE() - INTERVAL 1 DAY AND CURRENT_DATE ORDER BY id DESC ')
@@ -196,16 +202,18 @@ def status():
 
         return render_template('status_.html', status=status)
 
+
 @app.route('/set_location', methods=['GET', 'POST'])
 def set_location():
-        location = cursor.execute('''SELECT *,image2,substring_index(substring_index(image2, ',', -1), ',', 1) photo 
+    location = cursor.execute('''SELECT *,image2,substring_index(substring_index(image2, ',', -1), ',', 1) photo 
 FROM ads WHERE status = "Enable"
  AND locality = (SELECT location FROM user_login     )
                      ''')
-        # location = cursor.fetchall()
-        return jsonify(location)
+    # location = cursor.fetchall()
+    return jsonify(location)
 
     # return render_template('home_.html', status=status)
+
 
 @app.route('/register_', methods=['GET', 'POST'])
 def register_():
@@ -262,8 +270,8 @@ def login_():
             session['email'] = account['email']
             msg = Message(subject='OTP', sender='XCHANGE24 HOMES',
                           recipients=[email])
-            msg.body = str(
-                otp) + '\n This one time password is only use for login to the website.'
+            msg.body = "Your One Time Password is :" + str(
+                otp) + '\n This OTP is only for Login. \n Never Share OTP to anyone.\n\n Incase its not you! Please write a mail to our support team. \n Regards \n Xchange24 Homes '
             mail.send(msg)
             # flash('OTP has been sent to your registered Email. Please Check your Inbox.')
             return 'Sent successfully'
@@ -281,8 +289,8 @@ def login_():
             session['email'] = account['email']
             msg = Message(subject='OTP', sender='XCHANGE24 HOMES',
                           recipients=[email])
-            msg.body = str(
-                otp2) + '\n This one time password is only use for login to the website.'
+            msg.body = "Your One Time Password is :" + str(
+                otp2) + '\n This OTP is only for Login. \n Never Share OTP to anyone.\n\n Incase its not you! Please write a mail to our support team. \n Regards \n Xchange24 Homes '
             mail.send(msg)
             return 'Sent successfully'
         # else:
@@ -299,13 +307,13 @@ def login_():
             session['email'] = account['email']
             msg = Message(subject='OTP', sender='XCHANGE24 HOMES',
                           recipients=[email])
-            msg.body = str(
-                otp3) + '\n This one time password is only use for login to the website.'
+            msg.body = "Your One Time Password is :" + str(
+                otp3) + '\n This OTP is only for Login. \n Never Share OTP to anyone.\n\n Incase its not you! Please write a mail to our support team. \n Regards \n Xchange24 Homes '
             mail.send(msg)
-            flash('Successfully Loggedin','success')
+            flash('Successfully Loggedin', 'success')
             return 'Sent successfully'
         else:
-            flash('Incorrect email/password! Please Register First','error')
+            flash('Incorrect email/password! Please Register First', 'error')
     return render_template('login_.html', )
 
 
@@ -341,9 +349,9 @@ def password_login_():
         if account:
             session['loggedin'] = True
             session['email'] = account['email']
-            flash('Successfully Loggedin','success')
+            flash('Successfully Loggedin', 'success')
             return redirect('/')
-        
+
     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
         email = request.form['email']
         password = request.form['password']
@@ -353,7 +361,7 @@ def password_login_():
         if account:
             session['loggedin'] = True
             session['email'] = account['email']
-            flash('Successfully Loggedin','success')
+            flash('Successfully Loggedin', 'success')
             return redirect('/dashboard_')
         # else:
         #     flash('Incorrect email/password.')
@@ -366,10 +374,10 @@ def password_login_():
         if account:
             session['loggedin'] = True
             session['email'] = account['email']
-            flash('Successfully Loggedin','success')
+            flash('Successfully Loggedin', 'success')
             return redirect('/employee_product_')
         else:
-            flash('Incorrect email/password!','error')
+            flash('Incorrect email/password!', 'error')
             return redirect('/')
 
     return render_template('home_.html')
@@ -399,10 +407,10 @@ def admin_password_login_():
         if account:
             session['loggedin'] = True
             session['email'] = account['email']
-            flash('Successfully Loggedin.','success')
+            flash('Successfully Loggedin.', 'success')
             return redirect('/dashboard_')
         else:
-            flash('Incorrect email/password.','error')
+            flash('Incorrect email/password.', 'error')
     return render_template('dashboard_.html', user=user, total_ads=total_ads, user_detail=user_detail, total_ads_enable=total_ads_enable, total_ads_disable=total_ads_disable)
 
 
@@ -412,38 +420,39 @@ def verify_():
     if request.method == 'POST':
         user_otp = request.form['otp']
         if otp == int(user_otp):
-            flash('Verified. Logged In','success')
+            flash('Verified. Logged In', 'success')
             return redirect('/')
-    
+
         elif otp2 == int(user_otp):
-            flash('Verified. Logged In','success')
+            flash('Verified. Logged In', 'success')
             return redirect('/dashboard_')
 
         elif otp3 == int(user_otp):
-            flash('Verified. Logged In','success')
+            flash('Verified. Logged In', 'success')
             return redirect('/employee_product_')
         else:
-            flash('Invalid Otp.Check Your Inbox for correct OTP.','error')
+            flash('Invalid Otp.Check Your Inbox for correct OTP.', 'error')
             return redirect('/')
 
     return render_template('home_.html')
+
 
 @app.route('/admin_verify_', methods=['GET', 'POST'])
 def admin_verify_():
     msgg = ''
     if request.method == 'POST':
         user_otp = request.form['otp']
-        
+
         if otp2 == int(user_otp):
-            flash('Verified. Logged In Successfully.','success')
+            flash('Verified. Logged In Successfully.', 'success')
             return redirect('/dashboard_')
 
-        
         else:
-            flash('Invalid Otp.Check Your Inbox for correct OTP.','error')
+            flash('Invalid Otp.Check Your Inbox for correct OTP.', 'error')
             return redirect('/dashboard_')
 
     return render_template('dashboard_.html')
+
 
 @app.route('/user_profile', methods=['GET', 'POST'])
 def user_profile():
@@ -466,7 +475,7 @@ def user_profile():
         cursor.execute("UPDATE user_login SET name=%s,email=%s,mobile=%s,address1=%s,address2=%s,pin=%s,city=%s WHERE email = %s ",
                        (name, email, mobile, address1, address2, pin, city, email))
         conn.commit()
-        flash('Updated successfully','success')
+        flash('Updated successfully', 'success')
         return redirect('/user_profile')
     return render_template('user_profile.html', user=user, review=review)
 
@@ -485,7 +494,7 @@ def user_upload_photo():
 
         conn.commit()
 
-        flash('Image successfully uploaded','success')
+        flash('Image successfully uploaded', 'success')
         return redirect('/user_profile')
     return render_template('user_profile.html')
 
@@ -509,7 +518,7 @@ def admin_profile():
         cursor.execute("UPDATE admin_login SET name=%s,email=%s,mobile=%s WHERE email = %s ",
                        (name, email, mobile,  email))
         conn.commit()
-        flash('Details Updated successfully','success')
+        flash('Details Updated successfully', 'success')
         return redirect('/admin_profile')
     return render_template('admin_profile.html', admin=admin, review=review, status=status)
 
@@ -528,7 +537,7 @@ def admin_upload_photo():
 
         conn.commit()
 
-        flash('Profile photo successfully uploaded','success')
+        flash('Profile photo successfully uploaded', 'success')
         return redirect('/admin_profile')
     return render_template('admin_profile.html')
 
@@ -552,7 +561,7 @@ def employee_profile():
         cursor.execute("UPDATE employee SET name=%s,email=%s,mobile=%s WHERE email = %s ",
                        (name, email, mobile,  email))
         conn.commit()
-        flash('Details Updated successfully','success')
+        flash('Details Updated successfully', 'success')
         return redirect('/employee_profile')
     return render_template('employee_profile.html', employee=employee, review=review, status=status)
 
@@ -571,7 +580,7 @@ def employee_upload_photo():
 
         conn.commit()
 
-        flash('Profile photo successfully uploaded','success')
+        flash('Profile photo successfully uploaded', 'success')
         return redirect('/employee_profile')
     return render_template('employee_profile.html')
 
@@ -593,7 +602,7 @@ def edit_status(id):
             'UPDATE status SET image=%s,text=%s,date=%s WHERE id=%s', (filename, text, date, id))
         conn.commit()
 
-        flash('Status updated successfully','success')
+        flash('Status updated successfully', 'success')
         return redirect('/admin_profile')
 
 
@@ -622,7 +631,8 @@ def write_review():
         ms.body = str('Dear \n' + name + '\n'+'Thanks for your valuable feedback \n' +
                       'Your review was recorded successfully.Our team will contact you soon. ')
         mail.send(ms)
-        flash('Thanks for your valuable feedback! Our team will contact you soon.','success')
+        flash(
+            'Thanks for your valuable feedback! Our team will contact you soon.', 'success')
         return redirect('/user_profile')
     return render_template('write_review.html', user=user)
 
@@ -635,7 +645,7 @@ def delete_reviews(id):
 
     cursor.execute('DELETE FROM review WHERE id = {0}'.format(id))
     conn.commit()
-    flash('1 review deleted','success')
+    flash('1 review deleted', 'success')
     return redirect('/admin_profile')
 
 
@@ -646,7 +656,7 @@ def logout():
         session.pop('loggedin', None)
         session.pop('id', None)
         session.pop('email', None)
-        flash('Loggedout Successfully','success')
+        flash('Loggedout Successfully', 'success')
         return redirect('/')
 
 
@@ -657,7 +667,7 @@ def admin_logout():
         session.pop('loggedin', None)
         session.pop('id', None)
         session.pop('email', None)
-        flash('Loggedout Successfully','success')
+        flash('Loggedout Successfully', 'success')
         return redirect('/dashboard_')
 
 
@@ -675,14 +685,12 @@ def update_login_details():
     return render_template('dashboard.html', user=user, total_ads=total_ads)
 
 
-
 @app.route('/dashboard_', methods=['GET', 'POST'])
-
 def dashboard():
-    
+
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM admin_login WHERE email = "' +
-                   session['email']+'" ')
+                       session['email']+'" ')
         admin = cursor.fetchone()
         cursor.execute("SELECT  COUNT(id ) AS no_of_user FROM user_login ")
         user = cursor.fetchone()
@@ -704,15 +712,16 @@ def dashboard():
                 return render_template("dashboard_.html")
             else:
                 cursor.execute('UPDATE admin_login SET password = %s WHERE email = "' +
-                            session['email'] + '" ', (password))
+                               session['email'] + '" ', (password))
                 conn.commit()
-                flash('Password Changed Successfully','success')
+                flash('Password Changed Successfully', 'success')
                 return redirect('/dashboard_')
 
         return render_template('dashboard_.html', admin=admin, user=user, total_ads=total_ads, user_detail=user_detail, total_ads_enable=total_ads_enable, total_ads_disable=total_ads_disable)
     else:
-        
+
         return render_template('dashboard_.html')
+
 
 @app.route('/get_month_data', methods=['GET', 'POST'])
 def get_month_data():
@@ -738,7 +747,7 @@ def get_month_data():
             'SELECT MONTHNAME(date) as current_month, COUNT(id) AS total_product FROM ads WHERE month = %s ', (month))
         month_data = cursor.fetchall()
         conn.commit()
-        flash('Details fetched Successfully','success')
+        flash('Details fetched Successfully', 'success')
 
     return render_template('dashboard_.html', admin=admin, month_data=month_data, user=user, total_ads=total_ads, user_detail=user_detail, total_ads_enable=total_ads_enable, total_ads_disable=total_ads_disable)
 
@@ -747,7 +756,7 @@ def get_month_data():
 def admin_product():
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM admin_login WHERE email = "' +
-                    session['email']+'" ')
+                       session['email']+'" ')
         admin = cursor.fetchone()
         cursor.execute('''SELECT *,image2,
         substring_index(substring_index(image2, ',', -1), ',', 1) photo 
@@ -771,8 +780,9 @@ def admin_product():
 
         return render_template('admin_product_.html', admin=admin, ads=ads, location=location, locality=locality, enable=enable, disable=disable)
     else:
-        flash('Login to access this page!','error')
+        flash('Login to access this page!', 'error')
         return render_template('dashboard_.html')
+
 
 @app.route('/employee_product_', methods=['GET', 'POST'])
 def employee_product_():
@@ -808,7 +818,7 @@ def employee_product_():
             cursor.execute('UPDATE admin_login SET password = %s WHERE email = "' +
                            session['email'] + '" ', (password))
             conn.commit()
-            flash('Password Changed Successfully','success')
+            flash('Password Changed Successfully', 'success')
             return redirect('/employee_profile')
     return render_template('employee_product_.html', ads=ads, employee=employee, enable=enable, disable=disable, location=location, locality=locality)
 
@@ -874,7 +884,7 @@ FROM ads WHERE id = %s """, (id))
 def employee():
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM admin_login WHERE email = "' +
-                    session['email']+'" ')
+                       session['email']+'" ')
         admin = cursor.fetchone()
         cursor.execute('SELECT * FROM employee')
         employee = cursor.fetchall()
@@ -897,14 +907,16 @@ def employee():
                     file.save(os.path.join(
                         app.config['UPLOAD_FOLDER'], filename))
             cursor.execute('INSERT INTO employee(name,mobile,email,password,image) VALUES(%s,%s,%s,%s,%s)',
-                        (name, mobile, email, password, filename))
+                           (name, mobile, email, password, filename))
             conn.commit()
-            flash('Employee added successfully !','success')
+            flash('Employee added successfully !', 'success')
             return redirect('/employee_')
         return render_template('employee_.html', admin=admin, employee=employee, total=total)
     else:
-        flash('Login to access this page','error')
+        flash('Login to access this page', 'error')
         return render_template('dashboard_.html')
+
+
 @app.route('/get_data', methods=['GET', 'POST'])
 def get_data():
     cursor.execute('SELECT * FROM admin_login WHERE email = "' +
@@ -924,7 +936,7 @@ def get_data():
         cursor.execute('SELECT * FROM employee WHERE name = %s ', (listed_by))
         emp_report = cursor.fetchall()
         conn.commit()
-        flash('Details fetched successfully','success')
+        flash('Details fetched successfully', 'success')
 
     return render_template('employee_.html', admin=admin, data=data, employee=employee, emp_report=emp_report, total_data=total_data)
 
@@ -944,7 +956,7 @@ def update(id):
         cursor.execute(
             "UPDATE employee SET name = %s, mobile = %s, email = %s, password = %s WHERE id= %s", (name, mobile, email, password, id))
         conn.commit()
-        flash('Employee details Updated Successfully','success')
+        flash('Employee details Updated Successfully', 'success')
         return redirect('/employee_')
     return render_template('employee_.html', admin=admin)
 
@@ -957,7 +969,7 @@ def delete_doctors(id):
 
     cursor.execute('DELETE FROM employee WHERE id = {0}'.format(id))
     conn.commit()
-    flash('Employee deleted.','success')
+    flash('Employee deleted.', 'success')
     return redirect('/employee_')
 
 
@@ -1022,7 +1034,7 @@ def add_item_():
                     # cursor.execute(" SELECT *FROM (SELECT uni,photo FROM images) AS t, PIVOT (MAX(photo) FOR attribute IN([photo1], [photo2],[photo3],[photo4],[photo5])) AS p; ")
                     # data = cursor.fetchall()
         conn.commit()
-        flash('Product Added Successfully !','success')
+        flash('Product Added Successfully !', 'success')
         return redirect('/admin_product_')
 
     return render_template('admin_product_.html', admin=admin, location=location, locality=locality)
@@ -1030,7 +1042,6 @@ def add_item_():
 
 @app.route('/product_status_/<string:id>', methods=['POST', 'GET'])
 def product_status_(id):
-    error = 'None'
 
     if request.method == 'POST':
         status = request.form['status']
@@ -1039,7 +1050,7 @@ def product_status_(id):
         cursor.execute(
             'UPDATE ads SET status=%s,reason=%s WHERE id = %s', (status, reason, id))
         conn.commit()
-        flash('Successfully Updated !','success')
+        flash('Successfully Updated !', 'success')
         return redirect('/admin_product_')
 
 
@@ -1052,9 +1063,9 @@ def employee_product_status_(id):
         disable_by = request.form['disable_by']
 
         cursor.execute(
-            'UPDATE ads SET status=%s,reason=%s,disable_by=%s WHERE id = %s', (status, reason,disable_by, id))
+            'UPDATE ads SET status=%s,reason=%s,disable_by=%s WHERE id = %s', (status, reason, disable_by, id))
         conn.commit()
-        flash('Successfully Updated !','success')
+        flash('Successfully Updated !', 'success')
         return redirect('/employee_product_')
 
 
@@ -1063,7 +1074,7 @@ def delete_product(id):
 
     cursor.execute('DELETE FROM ads WHERE id = {0}'.format(id))
     conn.commit()
-    flash('1 product deleted.','success')
+    flash('1 product deleted.', 'success')
     return redirect('/admin_product_')
 
 
@@ -1132,7 +1143,7 @@ def edit_product(id):
                     # cursor.execute(" SELECT *FROM (SELECT uni,photo FROM images) AS t, PIVOT (MAX(photo) FOR attribute IN([photo1], [photo2],[photo3],[photo4],[photo5])) AS p; ")
                     # data = cursor.fetchall()
         conn.commit()
-        flash('Product Added Successfully !','success')
+        flash('Product Added Successfully !', 'success')
         return redirect('/employee_product_')
 
     return render_template('employee_product_.html', location=location, locality=locality)
@@ -1177,7 +1188,7 @@ def employee_edit_product_(id):
                        (title, house_type, bhk_type, bathroom, car, tenant, bachelor, total_floor, floor_no, facing, furnishing, area, city, locality, pg, sharing, owner_name, owner_mobile, owner_whatsapp, rent, listed_by, description, id))
 
         conn.commit()
-        flash('Updated Successfully !','success')
+        flash('Updated Successfully !', 'success')
         return redirect('/employee_product_')
 
     return render_template('employee_product_.html', product=product, location=location, locality=locality)
@@ -1206,7 +1217,7 @@ def add_status():
             'INSERT INTO status(image,text,date) VALUES(%s,%s,%s)', (filename, text, date))
         conn.commit()
 
-        flash('Status added successfully','success')
+        flash('Status added successfully', 'success')
 
         return redirect('/admin_product_')
 
@@ -1230,7 +1241,7 @@ def employee_add_status():
         cursor.execute(
             'INSERT INTO status(image,text,date) VALUES(%s,%s,%s)', (filename, text, date))
         conn.commit()
-        flash('Status added successfully','success')
+        flash('Status added successfully', 'success')
         return redirect('/employee_product_')
 
     return render_template('employee_product_.html')
@@ -1247,7 +1258,7 @@ def add_location():
         cursor.execute(
             'INSERT INTO location(city,locality) VALUES(%s,%s)', (city, locality))
         conn.commit()
-        flash('Status added successfully','success')
+        flash('Status added successfully', 'success')
         return redirect('/admin_product_')
 
     return render_template('admin_product_.html', admin=admin)
@@ -1262,10 +1273,10 @@ def employee_add_location():
         cursor.execute(
             'INSERT INTO location(city,locality) VALUES(%s,%s)', (city, locality))
         conn.commit()
-        flash('Location added successfully','success')
+        flash('Location added successfully', 'success')
         return redirect('/employee_product_')
 
     return render_template('employee_product_.html')
 
 
-app.run(debug=False, host='0.0.0.0',port=5000)
+app.run(debug=True, port=5089)

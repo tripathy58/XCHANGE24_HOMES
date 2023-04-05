@@ -32,7 +32,7 @@
   
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   
-    <script class="u-script" type="text/javascript" src="/static/js/chat.js" defer=""></script>
+    <!-- <script class="u-script" type="text/javascript" src="/static/js/chat.js" defer=""></script> -->
     <script class="u-script" type="text/javascript" src="/static/js/loadmore.js" defer=""></script>
     <script class="u-script" type="text/javascript" src="/static/js/filter.js" defer=""></script>
     <script class="u-script" type="text/javascript" src="/static/js/search.js" defer=""></script>
@@ -57,6 +57,11 @@
   <meta property="og:title" content="Page 1">
   <meta property="og:type" content="website">
 </head>
+
+{% if session['loggedin'] %}
+<div id="zsiqchat">
+</div>
+{% endif %}
 
 <body class="u-body u-xl-mode" data-lang="en">
 
@@ -130,7 +135,13 @@
     </div>
     {% if session['loggedin'] %}
     <a href="#" data-bs-toggle="modal" data-bs-target="#staticBackdropsetlocation"
-      class="u-active-white u-border-1 u-border-grey-75 u-btn u-btn-round u-button-style u-hidden-md u-hidden-sm u-hidden-xs u-hover-white u-radius-3 u-text-black u-text-hover-black u-white u-btn-1">{{user['location']}}&nbsp;<span
+      class="u-active-white u-border-1 u-border-grey-75 u-btn u-btn-round u-button-style u-hidden-md u-hidden-sm u-hidden-xs u-hover-white u-radius-3 u-text-black u-text-hover-black u-white u-btn-1">
+      {% if user['location'] %}
+        {{user['location']}}&nbsp;
+        {% else %}
+        Location &nbsp;
+        {% endif %}
+      <span
         class="u-icon u-text-black u-icon-1"><svg class="u-svg-content" viewBox="0 0 490.677 490.677" x="0px" y="0px"
           style="width: 1em; height: 1em;">
           <path
@@ -1288,7 +1299,7 @@ c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,24
           <div data-href="/product_details_/{{row.id}}"
             class="u-border-1 u-border-grey-40 u-container-align-center u-container-style u-hover-feature u-list-item u-radius-10 u-repeater-item u-shape-round u-list-item-4">
             <div class="u-container-layout u-similar-container u-container-layout-9">
-              <img class="u-image u-image-round u-radius-10 u-image-14" src="/static/uploads/{{row.image}}" alt=""
+              <img class="u-image u-image-round u-radius-10 u-image-14" src="/static/uploads/{{row.photo}}" alt=""
                 data-image-width="1280" data-image-height="853">
               <h6 class="u-text u-text-default u-text-37">{{row.title}}</h6>
               <h6 class="u-text u-text-default u-text-38"><span class="u-file-icon u-icon"><img src="/static/images/9131781.png"
@@ -1303,7 +1314,7 @@ c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,24
 
         </div>
         <a class="u-absolute-vcenter u-custom-color-4 u-gallery-nav u-gallery-nav-prev u-icon-circle u-opacity u-opacity-70 u-spacing-10 u-text-white u-gallery-nav-1"
-          href="#" role="button">
+          href="#" role="button" style="color:#f16f01 !important">
           <span aria-hidden="true">
             <svg viewBox="0 0 451.847 451.847">
               <path d="M97.141,225.92c0-8.095,3.091-16.192,9.259-22.366L300.689,9.27c12.359-12.359,32.397-12.359,44.751,0
@@ -1320,7 +1331,7 @@ c-12.354,12.365-32.386,12.365-44.745,0l-194.29-194.281C100.226,242.115,97.141,23
           </span>
         </a>
         <a class="u-absolute-vcenter u-custom-color-4 u-gallery-nav u-gallery-nav-next u-icon-circle u-opacity u-opacity-70 u-spacing-10 u-text-white u-gallery-nav-2"
-          href="#" role="button">
+          href="#" role="button" style="color:#f16f01 !important">
           <span aria-hidden="true">
             <svg viewBox="0 0 451.846 451.847">
               <path d="M345.441,248.292L151.154,442.573c-12.359,12.365-32.397,12.365-44.75,0c-12.354-12.354-12.354-32.391,0-44.744
